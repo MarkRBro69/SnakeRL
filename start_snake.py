@@ -46,6 +46,7 @@ def build_model(state_size, action_size, learning_rate) -> models.Sequential:
         models.Sequential: The constructed neural network model.
     """
     nn_model = models.Sequential([
+        layers.InputLayer(state_size),
         layers.LSTM(128, input_shape=state_size, return_sequences=True),
         layers.LSTM(128),
         layers.Dense(action_size, activation='linear')
@@ -58,6 +59,7 @@ def build_model(state_size, action_size, learning_rate) -> models.Sequential:
 if __name__ == "__main__":
     # tf.config.set_visible_devices([], 'GPU')
 
+    print(tf.sysconfig.get_build_info())
     print(tf.config.list_physical_devices('GPU'))
 
     print(f"TensorFlow version: {tf.__version__}")
@@ -109,14 +111,14 @@ if __name__ == "__main__":
     model = models.load_model('snake_model.keras')
 
     agent = DQNAgent(model=model, batch_size=32, gamma=0.95,
-                     epsilon=0.1, epsilon_decay=0.995, epsilon_min=0.001,
+                     epsilon=0.5, epsilon_decay=0.997, epsilon_min=0.001,
                      environment_count=environments_count,
                      memory_size=100_000, replay_batch_size=environments_count,
                      agent_turns=agent_turns, use_target_model=True, target_model_upd_freq=4, use_replays=True)
 
     # time_test(10, agent, environments, environments_count)
 
-    gui = m_snake_interface.SnakeGUI(environments, agent, train=False, render_flag=True,
+    gui = m_snake_interface.SnakeGUI(environments, agent, train=True, render_flag=True,
                                      graphs=True, save_every=100, iterations=100_000)
 
     gui.mainloop()

@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 import tkinter as tk
 from matplotlib.figure import Figure
@@ -5,6 +7,19 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from m_dqn_agent import DQNAgent
 from m_snake_environment import get_available_actions, SnakeEnvironments
+
+
+# Logger configuration
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.DEBUG)
+
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+console_handler.setFormatter(formatter)
+
+logger.addHandler(console_handler)
 
 
 def all_eqs(arrays: list, length: int) -> tuple:
@@ -136,7 +151,7 @@ class SnakeGUI(tk.Tk):
 
     def save_and_exit(self) -> None:
         """Save the model and exit the GUI."""
-        self.agent.save_model('./snake_model.keras')
+        self.agent.save_model('snake_model.keras')
         self.destroy()
 
     @staticmethod
@@ -238,8 +253,10 @@ class SnakeGUI(tk.Tk):
                         a_t = self._environment_max_turns
                         self.agent.set_agent_turns(a_t)
 
-            if e % save_every == 0:
-                self.agent.save_model('./snake_model.keras')
+            if e % save_every == 0 and save_every != 0:
+                self.agent.save_model('snake_model.keras')
+
+            logger.debug(self.agent.get_epsilon())
 
     def render(self, state: np.ndarray) -> None:
         """
